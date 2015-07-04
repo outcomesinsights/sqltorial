@@ -1,5 +1,6 @@
-require "sqltorial/version"
+require "sqltorial/metadata"
+require "sqltorial/assemble_command"
 
-module Sqltorial
+module SQLtorial
   # Your code goes here...
 end

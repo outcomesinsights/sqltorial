@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+
+require "escort"
+require "bundler/setup"
+require "sqltorial"
+
+Escort::App.create do |app|
+  app.version SQLtorial::VERSION
+  app.summary SQLtorial::SUMMARY
+  app.description SQLtorial::DESCRIPTION
+  app.options do |opts|
+    opts.opt :no_results, "Don't Include Results", short: '-n', long: '--no-results', type: :boolean, default: false
+    opts.opt :output, "Output File", short: '-o', long: '--output', type: :string, default: 'output.md'
+    opts.opt :preface, "Preface File", short: '-p', long: '--preface', type: :string, default: 'preface.md'
+  end
+  app.action do |options, arguments|
+    begin
+      SQLtorial::AssembleCommand.new(options, arguments).execute
+    rescue
+      puts $!.message
+      puts $!.backtrace.join("\n")
+      raise
+    end
+  end
+end
