@@ -18,9 +18,5 @@ module SQLtorial
       end
     end
   end
-
-  Dir.glob("**/*_directive.rb") do |directive_file|
-    require_relative File.basename(directive_file)
-  end
 end
 

@@ -12,16 +12,17 @@ module SQLtorial
     end
 
     def row_limit
-      @row_limit ||= all.length
+      @row_limit ||= count
     end
 
     def to_md
-      return "No results found." if all.empty?
+      return "**No results found.**" if all.empty?
       output = []
-      if all.length > row_limit
-        output << "Found #{all.length} results.  Displaying first #{row_limit}."
-        output << ""
+      output << "Found #{count} results."
+      if count > row_limit
+        output.last << "  Displaying first #{row_limit}."
       end
+      output << ""
       output << tableize(all.first.keys + additional_headers)
       output << tableize(orientations_for(all))
       output_rows.each do |row|
@@ -30,8 +31,16 @@ module SQLtorial
       output.join("\n") + "\n\n"
     end
 
+    def count
+      @count ||= query.from_self.count
+    end
+
     def all
-      @all ||= query.from_self.all
+      @all ||= begin
+        q = query.from_self
+        q = q.limit(row_limit)
+        q.all
+      end
     end
 
     def additional_headers
@@ -52,9 +61,12 @@ module SQLtorial
       "| #{columns.join(" | ")} |"
     end
 
+    def processors
+      @processors ||= make_processors
+    end
+
     def process(columns)
-      @processor ||= make_processors(columns)
-      @processor.map.with_index do |processor, index|
+      processors.map.with_index do |processor, index|
         value = columns[index]
         if processor
           processor.call(value)
@@ -64,21 +76,26 @@ module SQLtorial
       end
     end
 
-    def make_processors(columns)
-      columns.map do |column|
-        puts column.class
-        case column
-        when Float, BigDecimal
-          Proc.new do |column|
-            sprintf("%.02f", column)
-          end
-        when Numeric, Fixnum
-          Proc.new do |column|
-            commatize(column.to_s)
-          end
-        else
+    def make_processors
+      output_rows.first.map do |name, column|
+        if name.to_s.end_with?('_id')
           Proc.new do |column|
             column.to_s.chomp
+          end
+        else
+          case column
+          when Float, BigDecimal
+            Proc.new do |column|
+              sprintf("%.02f", column)
+            end
+          when Numeric, Fixnum
+            Proc.new do |column|
+              commatize(column.to_s)
+            end
+          else
+            Proc.new do |column|
+              column.to_s.chomp
+            end
           end
         end
       end

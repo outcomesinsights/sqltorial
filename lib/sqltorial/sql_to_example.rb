@@ -1,18 +1,26 @@
-require 'sequelizer'
+require 'sqltorial'
 require_relative 'query_to_md'
-require_relative 'directive'
+require_relative 'formatter'
 
 module SQLtorial
   class SqlToExample
-    include Sequelizer
-    attr :file
-    def initialize(file)
+    attr :file, :db
+    def initialize(file, db, number)
       @file = file
+      @db = db
+      @number = number
     end
 
     def formatted
-      #@formatted ||= `pg_format #{file}`
-      @formatted ||= `cat #{file} | anbt-sql-formatter`
+      @formatted ||= `pg_format #{file}`
+      #@formatted ||= `cat #{file} | anbt-sql-formatter`
+      #@formatted ||= `cat #{file} | py_format`
+      #@formatted ||= formatter.format(file.read)
+      #file.read
+    end
+
+    def formatter
+      @formatter ||= Formatter.new
     end
 
     def formatted_lines
@@ -40,8 +48,8 @@ module SQLtorial
     def make_prose_directives_and_query(query)
       lines = query.dup
       prose_lines = []
-      lines.shift while lines.first.empty?
-      prose_lines << lines.shift.sub(/^\s*-+\s*/, ' ').chomp.sub(/^ $/, "\n\n") while lines.first =~ /^(-+|$)/
+      lines.shift while lines.first.strip.empty?
+      prose_lines << lines.shift.sub(/^\s*-+\s*/, ' ').chomp.sub(/^ $/, "\n\n") while lines.first =~ /^\s*(-+|$)/
       directives, prose_lines = prose_lines.partition { |line| Directive.match(line) }
       [prose_lines.join(''), process_directives(directives), lines.join("\n")]
     end
@@ -57,22 +65,34 @@ module SQLtorial
 
         begin
           if is_create(sql)
-            create(sql)
+            execute(sql, include_results)
+            hash[sql] = [prose, create_to_md(include_results, sql, directives)];
+            next
+          elsif is_drop(sql)
+            execute(sql, include_results)
             hash[sql] = [prose, nil];
             next
           end
-          hash[sql] = [prose, include_results ? QueryToMD.new(db[sql.sub(';', '')], directives).to_md : nil]
+          hash[sql] = [prose, query_to_md(include_results, sql, directives)]
         rescue
           puts sql
           puts $!.message
           puts $!.backtrace.join("\n")
-          gets
+          $stdin.gets
         end
       end
       parts = []
       parts << "## Example #{number}: #{title}\n"
+      part_num = 0
       parts += hash.map do |key, value|
-        "#{value.first}\n\n```sql\n#{key}\n```\n\n#{value.last}\n"
+        arr = [value.first]
+        if key && !key.empty?
+          part_num += 1
+          arr << "**Query #{number}.#{part_num}**"
+          arr << "```sql\n#{key}\n```"
+        end
+        arr << value.last
+        arr.join("\n\n")
       end
       parts.join("\n") + "\n\n"
     end
@@ -91,11 +111,27 @@ module SQLtorial
     end
 
     def is_create(sql)
-      sql =~ /^create/i
+      sql =~ /^\s*create/i
     end
 
-    def create(sql)
-      db.execute(sql)
+    def is_drop(sql)
+      sql =~ /^\s*drop/i
+    end
+
+    def execute(sql, include_results)
+      db.execute(sql) if include_results
+    end
+
+    def create_to_md(include_results, sql, directives)
+      return nil unless include_results
+      table_name = /create\s*(?:temp)?\s*table\s*(\S+)/i.match(sql)[1].gsub('.', '__')
+      QueryToMD.new(db[table_name.to_sym], directives).to_md
+    end
+
+    def query_to_md(include_results, sql, directives)
+      return nil unless include_results
+      return nil if sql.empty?
+      QueryToMD.new(db[sql.sub(';', '')], directives).to_md
     end
   end
 end
