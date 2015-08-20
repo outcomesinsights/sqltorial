@@ -124,7 +124,7 @@ module SQLtorial
 
     def create_to_md(include_results, sql, directives)
       return nil unless include_results
-      table_name = /create\s*(?:temp)?\s*table\s*(\S+)/i.match(sql)[1].gsub('.', '__')
+      table_name = /create\s*(?:temp)?\s*(?:table|view)\s*(\S+)/i.match(sql)[1].gsub('.', '__')
       QueryToMD.new(db[table_name.to_sym], directives).to_md
     end
 
