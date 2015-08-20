@@ -1,3 +1,5 @@
+require_relative 'query_cache'
+
 module SQLtorial
   class QueryToMD
     attr :validation_directives, :other_directives
@@ -16,6 +18,10 @@ module SQLtorial
     end
 
     def to_md
+      cache.to_md
+    end
+
+    def get_md
       return "**No results found.**" if all.empty?
       output = []
       output << "Found #{count} results."
@@ -127,6 +133,10 @@ module SQLtorial
     def commatize(str)
       return str unless str =~ /^\d+$/
       str.reverse.chars.each_slice(3).map(&:join).join(',').reverse
+    end
+
+    def cache
+      @cache ||= QueryCache.new(self)
     end
   end
 end
