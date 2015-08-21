@@ -19,15 +19,15 @@ module SQLtorial
     end
 
     def cache_file
-      Pathname.pwd + '.cache' + cache_file_name
+      @cache_file ||= Pathname.pwd + '.cache' + cache_file_name
     end
 
     def cache_file_name
-      Digest::SHA256.hexdigest("#{input_str}") + ".md"
+      @cache_file_name ||= Digest::SHA256.hexdigest("#{input_str}") + ".md"
     end
 
     def input_str
-      %w(query row_limit validation_directives other_directives).inject("") do |s, meth|
+      @input_str ||= %w(query row_limit validation_directives other_directives).inject("") do |s, meth|
         s + query_to_md.send(meth).inspect
       end
     end
