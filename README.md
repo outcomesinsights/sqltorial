@@ -59,3 +59,13 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
+
+## Thanks
+
+- [Outcomes Insights, Inc.](http://outins.com)
+    - Many thanks for allowing me to release a portion of my work as Open Source Software!
+- [knitr](http://yihui.name/knitr/)
+    - Thanks for the inspiration!
+
+## License
+Released under the MIT license, Copyright (c) 2015 Outcomes Insights, Inc.
