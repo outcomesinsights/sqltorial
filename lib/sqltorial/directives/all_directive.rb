@@ -15,6 +15,10 @@ module SQLtorial
     def alter(query_to_md)
       query_to_md.row_limit = nil
     end
+
+    def inspect
+      "ALL"
+    end
   end
   Directive.register(AllDirective)
 end

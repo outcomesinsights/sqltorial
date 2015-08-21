@@ -21,6 +21,10 @@ module SQLtorial
       md = matcher.match(result[column])
       op == '=' ? !md.nil? : md.nil?
     end
+
+    def inspect
+      [column, op, matcher].join(" ")
+    end
   end
 
   Directive.register(RegexpDirective)
