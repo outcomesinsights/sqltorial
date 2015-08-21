@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.9"
   spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_dependency "sequelizer", "~> 0.0.5"
+  spec.add_dependency "sequelizer", "~> 0.0.6"
   spec.add_dependency "anbt-sql-formatter", "~> 0.0.3"
   spec.add_dependency "facets", "~> 3.0"
   spec.add_dependency "escort", "~> 0.4.0"
