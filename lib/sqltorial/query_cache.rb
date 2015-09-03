@@ -1,3 +1,5 @@
+require 'digest'
+
 module SQLtorial
   class QueryCache
     attr_reader :query_to_md
