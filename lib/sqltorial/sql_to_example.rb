@@ -12,11 +12,7 @@ module SQLtorial
     end
 
     def formatted
-      @formatted ||= `pg_format #{file}`
-      #@formatted ||= `cat #{file} | anbt-sql-formatter`
-      #@formatted ||= `cat #{file} | py_format`
-      #@formatted ||= formatter.format(file.read)
-      #file.read
+      @formatted ||= formatter.format(file)
     end
 
     def formatter
