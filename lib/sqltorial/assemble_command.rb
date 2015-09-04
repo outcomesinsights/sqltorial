@@ -11,7 +11,7 @@ module SQLtorial
     end
 
     def watch
-      listener = Listen.to(path) do |modified, added, removed|
+      listener = Listen.to(dir) do |modified, added, removed|
         process
        end
       listener.only(/\.sql$/)
@@ -35,6 +35,10 @@ module SQLtorial
 
     def process_dir
       @process_dir = path.directory? ? path : Pathname.pwd
+    end
+
+    def dir
+      @dir ||= path.directory? ? path : path.dirname
     end
 
     def path
