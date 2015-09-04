@@ -75,7 +75,6 @@ module SQLtorial
           puts sql
           puts $!.message
           puts $!.backtrace.join("\n")
-          $stdin.gets
         end
       end
       parts = []
