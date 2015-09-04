@@ -20,6 +20,24 @@ All notable changes to this project will be documented in this file.
 
 - Nothing.
 
+## 0.0.4
+
+### Added
+
+- Watch mode.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Better handling of whitespace.
+
 ## 0.0.3 - 2015-09-03
 
 ### Added

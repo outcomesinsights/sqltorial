@@ -33,4 +33,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "anbt-sql-formatter", "~> 0.0.3"
   spec.add_dependency "facets", "~> 3.0"
   spec.add_dependency "escort", "~> 0.4.0"
+  spec.add_dependency "listen", "~> 3.0.0"
 end

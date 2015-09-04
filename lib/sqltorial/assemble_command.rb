@@ -1,11 +1,25 @@
 require_relative 'sql_to_example'
 require 'sequelizer'
 require 'facets/pathname/chdir'
+require 'listen'
 
 module SQLtorial
   class AssembleCommand < ::Escort::ActionCommand::Base
     include Sequelizer
     def execute
+      global_options[:watch] ? watch : process
+    end
+
+    def watch
+      listener = Listen.to(dir) do |modified, added, removed|
+        process
+       end
+      listener.only(/\.sql$/)
+      listener.start
+      sleep while listener.processing?
+    end
+
+    def process
       process_dir.chdir do
         preface = Pathname.new(global_options[:preface]) if global_options[:preface]
         File.open(global_options[:output], 'w') do |f|
@@ -21,6 +35,10 @@ module SQLtorial
 
     def process_dir
       @process_dir = path.directory? ? path : Pathname.pwd
+    end
+
+    def dir
+      @dir ||= path.directory? ? path : path.dirname
     end
 
     def path
