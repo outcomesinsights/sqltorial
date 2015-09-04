@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- Nothing.
+- Better handling of whitespace.
 
 ## 0.0.3 - 2015-09-03
 

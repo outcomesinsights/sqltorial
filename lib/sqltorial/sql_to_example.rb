@@ -3,6 +3,7 @@ require_relative 'query_to_md'
 require_relative 'formatter'
 
 module SQLtorial
+  WHITESPACE_REGEX = /^\s*--/
   class SqlToExample
     attr :file, :db
     def initialize(file, db, number)
@@ -38,16 +39,16 @@ module SQLtorial
     end
 
     def title
-      @title ||= title_line.gsub(/^\s*-+\s*/, '')
+      @title ||= title_line.gsub(WHITESPACE_REGEX, '')
     end
 
     def make_prose_directives_and_query(query)
       lines = query.dup
       prose_lines = []
       lines.shift while lines.first.strip.empty?
-      prose_lines << lines.shift.sub(/^\s*-+\s*/, ' ').chomp.sub(/^ $/, "\n\n") while lines.first =~ /^\s*(-+|$)/
+      prose_lines << lines.shift.sub(WHITESPACE_REGEX, ' ').sub(/^\s*$/, "\n\n") while lines.first && (lines.first =~ WHITESPACE_REGEX || lines.first.empty?)
       directives, prose_lines = prose_lines.partition { |line| Directive.match(line) }
-      [prose_lines.join(''), process_directives(directives), lines.join("\n")]
+      [prose_lines.join(''), process_directives(directives), lines.join]
     end
 
     def number
@@ -101,7 +102,7 @@ module SQLtorial
     end
 
     def get_title_and_formatted_lines
-      all_lines = formatted.split("\n")
+      all_lines = formatted.split("\n").map { |l| l += "\n" }
       title_line = all_lines.shift
       [title_line, all_lines]
     end
