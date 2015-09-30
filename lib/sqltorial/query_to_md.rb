@@ -24,9 +24,9 @@ module SQLtorial
     def get_md
       return "**No results found.**" if all.empty?
       output = []
-      output << "Found #{count} results."
+      output << "Found #{commatize(count)} results."
       if count > row_limit
-        output.last << "  Displaying first #{row_limit}."
+        output.last << "  Displaying first #{commatize(row_limit)}."
       end
       output << ""
       output << tableize(all.first.keys + additional_headers)
@@ -84,7 +84,7 @@ module SQLtorial
 
     def make_processors
       output_rows.first.map do |name, column|
-        if name.to_s.end_with?('_id')
+        if name.to_s =~ /_?id(_|$)/
           Proc.new do |column|
             column.to_s.chomp
           end
@@ -92,11 +92,11 @@ module SQLtorial
           case column
           when Float, BigDecimal
             Proc.new do |column|
-              sprintf("%.02f", column)
+              commatize(sprintf("%.02f", column))
             end
           when Numeric, Fixnum
             Proc.new do |column|
-              commatize(column.to_s)
+              commatize(column)
             end
           else
             Proc.new do |column|
@@ -130,9 +130,13 @@ module SQLtorial
       widths.map { |width| '-' * width }
     end
 
-    def commatize(str)
-      return str unless str =~ /^\d+$/
-      str.reverse.chars.each_slice(3).map(&:join).join(',').reverse
+    def commatize(input)
+      str = input.to_s
+      return str unless str =~ /^[\d.]+$/
+      str, dec = str.split('.')
+      commaed = str.reverse.chars.each_slice(3).map(&:join).join(',').reverse
+      commaed << ".#{dec}" if dec and !dec.empty?
+      commaed
     end
 
     def cache

@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- Nothing.
+- More commas to for more types of number columns.
 
 ### Deprecated
 
@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- Nothing.
+- ID columns shouldn't end up with commas
 
 ## 0.0.4
 
