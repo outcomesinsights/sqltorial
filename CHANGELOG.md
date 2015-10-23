@@ -6,7 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- More commas to for more types of number columns.
+- More commas for more types of number columns.
+- Support for several Impala-oriented commands.
+- --ignore-cache option
+- --drop-tables option
 
 ### Deprecated
 
@@ -19,6 +22,8 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - ID columns shouldn't end up with commas
+- Markdown lists should render properly
+- Handle NULL values in columns
 
 ## 0.0.4
 
