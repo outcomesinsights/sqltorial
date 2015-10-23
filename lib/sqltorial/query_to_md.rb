@@ -92,11 +92,11 @@ module SQLtorial
           case column
           when Float, BigDecimal
             Proc.new do |column|
-              commatize(sprintf("%.02f", column))
+              column ? commatize(sprintf("%.02f", column)) : nil
             end
           when Numeric, Fixnum
             Proc.new do |column|
-              commatize(column)
+              column ? commatize(column.to_s) : nil
             end
           else
             Proc.new do |column|
