@@ -55,22 +55,22 @@ module SQLtorial
       @number ||= file.basename.to_s.to_i
     end
 
-    def to_str(include_results = true)
+    def to_str(options = {})
+      options = options.merge(include_results: true)
       hash = {}
       queries.each_with_index do |query, index|
         prose, directives, sql = make_prose_directives_and_query(query)
 
         begin
           if is_create(sql)
-            execute(sql, include_results)
-            hash[sql] = [prose, create_to_md(include_results, sql, directives)];
+            hash[sql] = [prose, create_to_md(options, sql, directives)];
             next
-          elsif is_drop(sql)
-            execute(sql, include_results)
+          elsif is_passthru(sql)
+            execute(sql, options)
             hash[sql] = [prose, nil];
             next
           end
-          hash[sql] = [prose, query_to_md(include_results, sql, directives)]
+          hash[sql] = [prose, query_to_md(options, sql, directives)]
         rescue
           puts sql
           puts $!.message
@@ -114,18 +114,34 @@ module SQLtorial
       sql =~ /^\s*drop/i
     end
 
-    def execute(sql, include_results)
-      db.execute(sql) if include_results
+    def is_use(sql)
+      sql =~ /^\s*use/i
     end
 
-    def create_to_md(include_results, sql, directives)
-      return nil unless include_results
-      table_name = /create\s*(?:temp)?\s*(?:table|view)\s*(\S+)/i.match(sql)[1].gsub('.', '__')
+    def is_compute(sql)
+      sql =~ /^\s*compute\s*stats/i
+    end
+
+    def is_passthru(sql)
+      is_drop(sql) || is_use(sql) || is_compute(sql)
+    end
+
+    def execute(sql, options)
+      db.execute(sql) if options[:include_results]
+    end
+
+    def create_to_md(options, sql, directives)
+      return nil unless options[:include_results]
+      table_name = /create\s*(?:temp)?\s*(?:table|view)(?:\s*if\s*not\s*exists)?\s*(\S+)/i.match(sql)[1]
+      execute("DROP TABLE IF EXISTS #{table_name}", options) if options[:drop_it]
+      execute(sql, options)
+      execute("COMPUTE STATS #{table_name}", options)
+      table_name.gsub!('.', '__')
       QueryToMD.new(db[table_name.to_sym], directives).to_md
     end
 
-    def query_to_md(include_results, sql, directives)
-      return nil unless include_results
+    def query_to_md(options, sql, directives)
+      return nil unless options[:include_results]
       return nil if sql.empty?
       QueryToMD.new(db[sql.sub(';', '')], directives).to_md
     end
