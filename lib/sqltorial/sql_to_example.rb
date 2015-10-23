@@ -48,7 +48,7 @@ module SQLtorial
       lines.shift while lines.first.strip.empty?
       prose_lines << lines.shift.sub(WHITESPACE_REGEX, ' ').sub(/^\s*$/, "\n\n") while lines.first && (lines.first =~ WHITESPACE_REGEX || lines.first.empty?)
       directives, prose_lines = prose_lines.partition { |line| Directive.match(line) }
-      [prose_lines.join(''), process_directives(directives), lines.join]
+      [prose_lines.map(&:strip).join("\n"), process_directives(directives), lines.join("\n")]
     end
 
     def number
@@ -90,7 +90,7 @@ module SQLtorial
         arr << value.last
         arr.join("\n\n")
       end
-      parts.join("\n") + "\n\n"
+      parts.join("\n\n") + "\n\n"
     end
 
     private
