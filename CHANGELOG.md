@@ -6,6 +6,24 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
+## 0.0.5
+
+### Added
+
 - More commas for more types of number columns.
 - Support for several Impala-oriented commands.
 - --ignore-cache option
