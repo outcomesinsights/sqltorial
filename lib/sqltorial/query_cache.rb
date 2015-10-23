@@ -21,7 +21,7 @@ module SQLtorial
     end
 
     def cache_file
-      @cache_file ||= Pathname.pwd + '.cache' + cache_file_name
+      @cache_file ||= Pathname.pwd + '.sqltorial_cache' + cache_file_name
     end
 
     def cache_file_name

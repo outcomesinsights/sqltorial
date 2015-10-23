@@ -2,6 +2,7 @@ require_relative 'sql_to_example'
 require 'sequelizer'
 require 'facets/pathname/chdir'
 require 'listen'
+require "fileutils"
 
 module SQLtorial
   class AssembleCommand < ::Escort::ActionCommand::Base
@@ -20,13 +21,14 @@ module SQLtorial
     end
 
     def process
+      FileUtils.rm_rf(".sqltorial_cache") if global_options[:ignore_cache]
       process_dir.chdir do
         preface = Pathname.new(global_options[:preface]) if global_options[:preface]
         File.open(global_options[:output], 'w') do |f|
           f.puts preface.read if preface && preface.exist?
           examples = files.map.with_index do |file, index|
             Escort::Logger.output.puts "Examplizing #{file.to_s}"
-            SqlToExample.new(file, db, index + 1).to_str(!global_options[:no_results])
+            SqlToExample.new(file, db, index + 1).to_str(global_options)
           end
           f.puts(examples.join("\n\n"))
         end

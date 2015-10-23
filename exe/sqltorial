@@ -11,6 +11,8 @@ Escort::App.create do |app|
 
   app.options do |opts|
     opts.opt :no_results, "Don't Include Results", short: '-n', long: '--no-results', type: :boolean, default: false
+    opts.opt :drop_it, "Drop tables before create", short: '-D', long: '--drop-tables', type: :boolean, default: false
+    opts.opt :ignore_cache, "Ignore cache", short: '-C', long: '--ignore-cache', type: :boolean, default: false
     opts.opt :output, "Output File", short: '-o', long: '--output', type: :string, default: 'output.md'
     opts.opt :preface, "Preface File", short: '-p', long: '--preface', type: :string, default: 'preface.md'
     opts.opt :watch, "Watch Mode", short: '-w', long: '--watch', type: :boolean, default: false
