@@ -1,6 +1,13 @@
 module SQLtorial
   class ValidColumnDirective
-    REGEXP = /^ DIRECTIVE:\s*(\S+)\s+(\S+)\s+(.+)/
+    REGEXP = /^\s*DIRECTIVE:\s*(\S+)\s+(\S+)\s+(.+)/
+
+    class << self
+      def regexp
+        REGEXP
+      end 
+    end 
+
     attr :column, :op, :matcher
     def initialize(line)
       _, column, op, matcher = REGEXP.match(line).to_a
@@ -18,5 +25,5 @@ module SQLtorial
       [column, op, matcher].join(" ")
     end
   end
-  Directive.register(AllDirective)
+  Directive.register(ValidColumnDirective)
 end
