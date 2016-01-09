@@ -65,7 +65,7 @@ module SQLtorial
     end
 
     def cache
-      @cache ||= Cache.new(db)
+      @cache ||= Cache.new(db, global_options)
     end
   end
 end
