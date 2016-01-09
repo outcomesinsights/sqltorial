@@ -40,9 +40,7 @@ module SQLtorial
 
     def all
       @all ||= begin
-        q = query.from_self
-        q = q.limit(row_limit)
-        q.all
+        query.limit(row_limit).all
       end
     end
 
