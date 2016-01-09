@@ -40,7 +40,13 @@ module SQLtorial
 
     def all
       @all ||= begin
-        query.limit(row_limit).all
+        if query.db.database_type == :impala
+          sql = query.sql.gsub(';', '')
+          sql << " limit #{row_limit}"
+          query.db[sql].all
+        else
+          query.limit(row_limit).all
+        end
       end
     end
 
