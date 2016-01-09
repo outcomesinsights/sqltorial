@@ -50,7 +50,7 @@ module SQLtorial
     end
 
     def files
-      path.directory? ? Pathname.glob('*.sql') : files_from_file
+      path.directory? ? Pathname.glob('*.sql').sort : files_from_file
     end
 
     def files_from_file
