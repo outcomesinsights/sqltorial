@@ -28,7 +28,7 @@ module SQLtorial
           f.puts preface.read if preface && preface.exist?
           files.each.with_index do |file, index|
             Escort::Logger.output.puts "Examplizing #{file.to_s}"
-            example = SqlToExample.new(file, db, index + 1)
+            example = SqlToExample.new(file, db, global_options.merge(suggested_number: index + 1))
             f.puts example.to_str(global_options)
             f.puts "\n\n"
             f.flush

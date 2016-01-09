@@ -16,6 +16,7 @@ Escort::App.create do |app|
     opts.opt :output, "Output File", short: '-o', long: '--output', type: :string, default: 'output.md'
     opts.opt :preface, "Preface File", short: '-p', long: '--preface', type: :string, default: 'preface.md'
     opts.opt :watch, "Watch Mode", short: '-w', long: '--watch', type: :boolean, default: false
+    opts.opt :no_auto_numbering, "No Auto Numbering", long: '--no-auto-numbering', type: :boolean, default: false
   end
 
   app.action do |options, arguments|

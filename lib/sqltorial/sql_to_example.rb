@@ -6,10 +6,14 @@ module SQLtorial
   WHITESPACE_REGEX = /^\s*--/
   class SqlToExample
     attr :file, :db
-    def initialize(file, db, number)
+    def initialize(file, db, options = {})
       @file = file
       @db = db
-      @number = number
+      if options[:no_auto_numbering]
+        @number = options[:suggested_number] || get_number
+      else
+        @number = get_number
+      end
     end
 
     def formatted
@@ -51,7 +55,7 @@ module SQLtorial
       [prose_lines.map(&:strip).join("\n"), process_directives(directives), lines.join("\n")]
     end
 
-    def number
+    def get_number
       @number ||= file.basename.to_s.to_i
     end
 
