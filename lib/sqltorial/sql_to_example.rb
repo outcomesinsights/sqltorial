@@ -5,10 +5,11 @@ require_relative 'formatter'
 module SQLtorial
   WHITESPACE_REGEX = /^\s*--/
   class SqlToExample
-    attr :file, :db
+    attr :file, :db, :number, :options
     def initialize(file, db, options = {})
       @file = file
       @db = db
+      @options = options
       if options[:no_auto_numbering]
         @number = options[:suggested_number] || get_number
       else
@@ -59,22 +60,22 @@ module SQLtorial
       @number ||= file.basename.to_s.to_i
     end
 
-    def to_str(options = {})
-      options = options.merge(include_results: true)
+    def to_str(opts = {})
+      opts = options.merge(opts.merge(include_results: true))
       hash = {}
       queries.each_with_index do |query, index|
         prose, directives, sql = make_prose_directives_and_query(query)
 
         begin
           if is_create(sql)
-            hash[sql] = [prose, create_to_md(options, sql, directives)];
+            hash[sql] = [prose, create_to_md(opts, sql, directives)];
             next
           elsif is_passthru(sql)
-            execute(sql, options)
+            execute(sql, opts)
             hash[sql] = [prose, nil];
             next
           end
-          hash[sql] = [prose, query_to_md(options, sql, directives)]
+          hash[sql] = [prose, query_to_md(opts, sql, directives)]
         rescue
           puts sql
           puts $!.message
@@ -130,24 +131,24 @@ module SQLtorial
       is_drop(sql) || is_use(sql) || is_compute(sql)
     end
 
-    def execute(sql, options)
-      db.execute(sql) if options[:include_results]
+    def execute(sql, opts)
+      db.execute(sql) if opts[:include_results]
     end
 
-    def create_to_md(options, sql, directives)
-      return nil unless options[:include_results]
+    def create_to_md(opts, sql, directives)
+      return nil unless opts[:include_results]
       table_name = /create\s*(?:temp)?\s*(?:table|view)(?:\s*if\s*not\s*exists)?\s*(\S+)/i.match(sql)[1]
-      execute("DROP TABLE IF EXISTS #{table_name}", options) if options[:drop_it]
-      execute(sql, options)
-      execute("COMPUTE STATS #{table_name}", options)
+      execute("DROP TABLE IF EXISTS #{table_name}", opts) if options[:drop_it]
+      execute(sql, opts)
+      execute("COMPUTE STATS #{table_name}", opts)
       table_name.gsub!('.', '__')
       QueryToMD.new(db[table_name.to_sym], directives).to_md
     end
 
-    def query_to_md(options, sql, directives)
-      return nil unless options[:include_results]
+    def query_to_md(opts, sql, directives)
+      return nil unless opts[:include_results]
       return nil if sql.empty?
-      QueryToMD.new(db[sql.sub(';', '')], directives).to_md
+      QueryToMD.new(db[sql.sub(';', '')], directives, opts).to_md
     end
   end
 end

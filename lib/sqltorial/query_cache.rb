@@ -1,10 +1,10 @@
-require 'digest'
 
 module SQLtorial
   class QueryCache
-    attr_reader :query_to_md
+    attr_reader :query_to_md, :cache
 
-    def initialize(query_to_md)
+    def initialize(cache, query_to_md, options = {})
+      @cache = cache
       @query_to_md = query_to_md
     end
 
@@ -21,11 +21,7 @@ module SQLtorial
     end
 
     def cache_file
-      @cache_file ||= Pathname.pwd + '.sqltorial_cache' + cache_file_name
-    end
-
-    def cache_file_name
-      @cache_file_name ||= Digest::SHA256.hexdigest("#{input_str}") + ".md"
+      @cache_file ||= cache.cache_file_path(cache.hash_it(input_str) + ".md")
     end
 
     def input_str
@@ -33,5 +29,6 @@ module SQLtorial
         s + query_to_md.send(meth).inspect
       end
     end
+
   end
 end

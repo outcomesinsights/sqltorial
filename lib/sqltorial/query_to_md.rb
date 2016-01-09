@@ -3,18 +3,15 @@ require_relative 'query_cache'
 module SQLtorial
   class QueryToMD
     attr :validation_directives, :other_directives
-    attr_accessor :query, :row_limit
-    def initialize(query, directives, row_limit = 10)
+    attr_accessor :query, :row_limit, :options
+    def initialize(query, directives, options = {})
       @query = query
       @validation_directives, @other_directives = directives.partition { |d| d.respond_to?(:validate) }
-      @row_limit = row_limit
+      @row_limit = options.fetch(:row_limit, 10)
+      @options = options
       @other_directives.each do |directive|
         directive.alter(self)
       end
-    end
-
-    def row_limit
-      @row_limit ||= count
     end
 
     def to_md
@@ -140,7 +137,7 @@ module SQLtorial
     end
 
     def cache
-      @cache ||= QueryCache.new(self)
+      @cache ||= QueryCache.new(options[:cache], self)
     end
   end
 end
