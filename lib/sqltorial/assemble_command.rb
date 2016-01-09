@@ -26,11 +26,13 @@ module SQLtorial
         preface = Pathname.new(global_options[:preface]) if global_options[:preface]
         File.open(global_options[:output], 'w') do |f|
           f.puts preface.read if preface && preface.exist?
-          examples = files.map.with_index do |file, index|
+          files.each.with_index do |file, index|
             Escort::Logger.output.puts "Examplizing #{file.to_s}"
-            SqlToExample.new(file, db, index + 1).to_str(global_options)
+            example = SqlToExample.new(file, db, index + 1)
+            f.puts example.to_str(global_options)
+            f.puts "\n\n"
+            f.flush
           end
-          f.puts(examples.join("\n\n"))
         end
       end
     end
