@@ -1,4 +1,5 @@
 require_relative 'query_cache'
+require 'facets/time/elapse'
 
 module SQLtorial
   class QueryToMD
@@ -19,8 +20,19 @@ module SQLtorial
     end
 
     def get_md
-      return "**No results found.**" if all.empty?
+      output = get_output
+      output.join("\n") + "\n***\n"
+    end
+
+    def get_output
       output = []
+      output << "*Query ran in #{time_elapsed}.*\n" if time_elapsed
+
+      if all.empty?
+        output << "**No results found.**"
+        return output
+      end
+
       output << "Found #{commatize(count)} results."
       if count > row_limit
         output.last << "  Displaying first #{commatize(row_limit)}."
@@ -31,22 +43,37 @@ module SQLtorial
       output_rows.each do |row|
         output << tableize(process(row.values))
       end
-      output.join("\n") + "\n\n"
+      output
     end
 
     def count
       @count ||= query.from_self.count
     end
 
+    def time_elapsed
+      @elapsed_time || all
+      return nil unless options[:report_times] && @elapsed_time
+      t = @elapsed_time
+      ("%02dd%02dh%02dm%02ds" % [t/86400, t/3600%24, t/60%60, t%60]).gsub(/00[^s]/, '')
+    end
+
     def all
       @all ||= begin
-        if query.db.database_type == :impala
-          sql = query.sql.gsub(';', '')
-          sql << " limit #{row_limit}"
-          query.db[sql].all
-        else
-          query.limit(row_limit).all
+        results = nil
+        @elapsed_time = Time.elapse do
+          results = get_all
         end
+        results
+      end
+    end
+
+    def get_all
+      if query.db.database_type == :impala
+        sql = query.sql.gsub(';', '')
+        sql << " limit #{row_limit}"
+        query.db[sql].all
+      else
+        query.limit(row_limit).all
       end
     end
 

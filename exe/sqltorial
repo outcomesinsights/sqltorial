@@ -18,6 +18,7 @@ Escort::App.create do |app|
     opts.opt :watch, "Watch Mode", short: '-w', long: '--watch', type: :boolean, default: false
     opts.opt :no_auto_numbering, "No Auto Numbering", long: '--no-auto-numbering', type: :boolean, default: false
     opts.opt :setup, "Commands to send to DB for setup", long: '--setup', type: :string
+    opts.opt :report_times, "Report time elapsed for each query", long: '--report-times', type: :boolean, default: false
   end
 
   app.action do |options, arguments|
