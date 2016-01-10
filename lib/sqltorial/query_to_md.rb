@@ -111,13 +111,13 @@ module SQLtorial
     end
 
     def make_processors
-      output_rows.first.map do |name, column|
+      output_rows.first.map do |name, col|
         if name.to_s =~ /_?id(_|$)/
           Proc.new do |column|
             column.to_s.chomp
           end
         else
-          case column
+          case col
           when Float, BigDecimal
             Proc.new do |column|
               column ? commatize(sprintf("%.02f", column)) : nil
