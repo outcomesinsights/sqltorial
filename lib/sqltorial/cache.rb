@@ -27,7 +27,7 @@ module SQLtorial
 
     def hashable_options
       opts = options.dup
-      %i(ignore_cache output watch preface).each do |key|
+      %w(ignore_cache output watch preface).map(&:to_sym).each do |key|
         opts.delete(key)
       end
       opts
