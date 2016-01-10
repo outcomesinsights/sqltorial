@@ -33,7 +33,7 @@ module SQLtorial
     end
 
     def queries
-      @queries ||= formatted_lines.slice_after { |l| l =~ /;$/ }
+      @queries ||= formatted_lines.slice_before { |l| l =~ /;$/ }
     end
 
     def title_line
@@ -50,7 +50,8 @@ module SQLtorial
     def make_prose_directives_and_query(query)
       lines = query.dup
       prose_lines = []
-      lines.shift while lines.first.strip.empty?
+      lines.shift if lines.first.strip == ';'
+      lines.shift while lines.first && lines.first.strip.empty?
       prose_lines << lines.shift.sub(WHITESPACE_REGEX, ' ').sub(/^\s*$/, "\n\n") while lines.first && (lines.first =~ WHITESPACE_REGEX || lines.first.empty?)
       directives, prose_lines = prose_lines.partition { |line| Directive.match(line) }
       [prose_lines.map(&:strip).join("\n"), process_directives(directives), lines.join("\n")]
@@ -90,7 +91,7 @@ module SQLtorial
         if key && !key.empty?
           part_num += 1
           arr << "**Query #{number}.#{part_num}**"
-          arr << "```sql\n#{key}\n```"
+          arr << "```sql\n#{key + ";"}\n```"
         end
         arr << value.last
         arr.join("\n\n")
@@ -106,7 +107,7 @@ module SQLtorial
     end
 
     def get_title_and_formatted_lines
-      all_lines = formatted.split("\n").map { |l| l += "\n" }
+      all_lines = formatted.gsub(";", "\n;").split("\n")
       title_line = all_lines.shift
       [title_line, all_lines]
     end
