@@ -68,6 +68,11 @@ module SQLtorial
     end
 
     def get_all
+      unless row_limit
+        self.row_limit = count
+        return query.all
+      end
+
       if query.db.database_type == :impala
         sql = query.sql.gsub(';', '')
         sql << " limit #{row_limit}"

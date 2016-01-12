@@ -2,7 +2,7 @@ require_relative "directive"
 
 module SQLtorial
   class AllDirective
-    REGEXP = /^ DIRECTIVE:\s*ALL/
+    REGEXP = /^\s*DIRECTIVE:\s*ALL/
     class << self
       def regexp
         REGEXP
