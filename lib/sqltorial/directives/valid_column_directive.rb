@@ -5,8 +5,8 @@ module SQLtorial
     class << self
       def regexp
         REGEXP
-      end 
-    end 
+      end
+    end
 
     attr :column, :op, :matcher
     def initialize(line)
