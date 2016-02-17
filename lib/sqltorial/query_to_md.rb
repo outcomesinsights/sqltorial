@@ -44,6 +44,12 @@ module SQLtorial
         output << tableize(process(row.values))
       end
       output
+    rescue
+      puts "Query failed!"
+      puts query
+      puts $!.message
+      puts $!.backtrace.join("\n")
+      output = ["**Query Failed To Complete**"]
     end
 
     def count
