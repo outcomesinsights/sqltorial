@@ -48,13 +48,14 @@ module SQLtorial
     end
 
     def make_prose_directives_and_query(query)
-      lines = query.dup
+      lines = query.dup.map(&:chomp)
       prose_lines = []
       lines.shift if lines.first.strip == ';'
       lines.shift while lines.first && lines.first.strip.empty?
-      prose_lines << lines.shift.sub(WHITESPACE_REGEX, ' ').sub(/^\s*$/, "\n\n") while lines.first && (lines.first =~ WHITESPACE_REGEX || lines.first.empty?)
+      prose_lines << lines.shift.sub(WHITESPACE_REGEX, '').sub(/^\s*$/, "\n\n") while lines.first && (lines.first =~ WHITESPACE_REGEX || lines.first.empty?)
       directives, prose_lines = prose_lines.partition { |line| Directive.match(line) }
-      [prose_lines.map(&:strip).join("\n"), process_directives(directives), lines.join("\n")]
+      prose_lines = prose_lines.map { |l| l.sub(/^\s/, '') }
+      [prose_lines.join("\n"), process_directives(directives), lines.join("\n")]
     end
 
     def get_number
