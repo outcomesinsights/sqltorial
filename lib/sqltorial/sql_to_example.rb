@@ -91,7 +91,8 @@ module SQLtorial
         arr = [value.first]
         if key && !key.empty?
           part_num += 1
-          arr << "**Query #{number}.#{part_num}**"
+          arr << "#### Query #{number}.#{part_num}"
+          arr << ""
           arr << "```sql\n#{key + ";"}\n```"
         end
         arr << value.last
