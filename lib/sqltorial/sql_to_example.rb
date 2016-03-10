@@ -85,7 +85,7 @@ module SQLtorial
         end
       end
       parts = []
-      parts << "## Example #{number}: #{title}\n"
+      parts << "# Example #{number}: #{title}\n"
       part_num = 0
       parts += hash.map do |key, value|
         arr = [value.first]
